@@ -17,6 +17,10 @@ class MissingColumnsError(ValueError):
     """Raised when an uploaded CSV does not carry every column the models need."""
 
 
+class InvalidTargetError(ValueError):
+    """Raised when the target column cannot be interpreted as a purchase label."""
+
+
 def build_feature_pipeline() -> ColumnTransformer:
     """Scale the continuous session metrics and one-hot the unordered labels."""
     scaled_block = Pipeline([("scale", StandardScaler())])
@@ -33,15 +37,43 @@ def build_feature_pipeline() -> ColumnTransformer:
     )
 
 
+MISSING_CATEGORY_SENTINEL = "missing"
+
+
 def normalise_frame(frame: pd.DataFrame) -> pd.DataFrame:
     """Coerce the raw CSV into the dtypes the fitted pipeline expects."""
     cleaned = frame.copy()
     for column in CATEGORICAL_FEATURES:
-        cleaned[column] = cleaned[column].astype(str)
+        cleaned[column] = cleaned[column].fillna(MISSING_CATEGORY_SENTINEL).astype(str)
     for column in NUMERIC_FEATURES:
         cleaned[column] = pd.to_numeric(cleaned[column], errors="coerce")
     cleaned[NUMERIC_FEATURES] = cleaned[NUMERIC_FEATURES].fillna(0)
     return cleaned
+
+
+def coerce_target(labels: pd.Series) -> pd.Series:
+    """Parse the Revenue column into 0/1 ints, rejecting blank or unreadable cells."""
+    if labels.dtype == object or labels.dtype == bool or str(labels.dtype) == "str":
+        truthy = {"true", "1", "yes", "y", "t"}
+        falsy = {"false", "0", "no", "n", "f"}
+        parsed = labels.astype(str).str.strip().str.lower()
+        unreadable = ~parsed.isin(truthy | falsy)
+    else:
+        parsed = pd.to_numeric(labels, errors="coerce")
+        unreadable = parsed.isna()
+        truthy = None
+
+    if unreadable.any():
+        bad_rows = [str(i) for i in labels.index[unreadable][:5]]
+        raise InvalidTargetError(
+            f"Target column '{TARGET_COLUMN}' has blank or unreadable values in "
+            f"{int(unreadable.sum())} row(s) (e.g. row {', '.join(bad_rows)}). "
+            "Every row must have a Revenue value of True/False, 1/0, or yes/no."
+        )
+
+    if truthy is not None:
+        return parsed.isin(truthy).astype(int)
+    return parsed.astype(int)
 
 
 def split_features_and_target(frame: pd.DataFrame):
@@ -55,12 +87,6 @@ def split_features_and_target(frame: pd.DataFrame):
 
     cleaned = normalise_frame(frame)
     predictors = cleaned[FEATURE_COLUMNS]
-    labels = cleaned[TARGET_COLUMN]
-
-    if labels.dtype == object or labels.dtype == bool or str(labels.dtype) == "str":
-        truthy = {"true", "1", "yes", "y", "t"}
-        labels = labels.astype(str).str.strip().str.lower().isin(truthy).astype(int)
-    else:
-        labels = labels.astype(int)
+    labels = coerce_target(cleaned[TARGET_COLUMN])
 
     return predictors, labels

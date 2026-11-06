@@ -15,7 +15,11 @@ from sklearn.metrics import classification_report, confusion_matrix, roc_curve
 
 from src.config import CLASSIFIER_REGISTRY, METRICS_PATH, MODEL_DIR, TEST_EXPORT_PATH
 from src.metrics import METRIC_ORDER, positive_class_scores, score_classifier
-from src.preprocessing import MissingColumnsError, split_features_and_target
+from src.preprocessing import (
+    InvalidTargetError,
+    MissingColumnsError,
+    split_features_and_target,
+)
 
 st.set_page_config(
     page_title="Shopper Purchase-Intent Classifier",
@@ -133,7 +137,11 @@ with st.sidebar:
             st.caption(f"• `{name.replace('learner__', '')}` = `{value}`")
 
 if uploaded is not None and not use_bundled:
-    source_frame = pd.read_csv(uploaded)
+    try:
+        source_frame = pd.read_csv(uploaded)
+    except (pd.errors.ParserError, UnicodeDecodeError, ValueError) as problem:
+        st.error(f"Could not read '{uploaded.name}' as a CSV: {problem}")
+        st.stop()
     source_name = uploaded.name
 elif use_bundled:
     source_frame = load_bundled_holdout()
@@ -144,7 +152,7 @@ else:
 
 try:
     predictors, truth = split_features_and_target(source_frame)
-except MissingColumnsError as problem:
+except (MissingColumnsError, InvalidTargetError) as problem:
     st.error(str(problem))
     st.stop()
 

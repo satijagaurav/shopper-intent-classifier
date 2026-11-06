@@ -7,7 +7,6 @@ RAW_DATA_PATH = PROJECT_ROOT / "data" / "online_shoppers_intention.csv"
 MODEL_DIR = PROJECT_ROOT / "model"
 TEST_EXPORT_PATH = PROJECT_ROOT / "test_data.csv"
 METRICS_PATH = MODEL_DIR / "metrics.json"
-PREPROCESSOR_PATH = MODEL_DIR / "preprocessor.joblib"
 
 TARGET_COLUMN = "Revenue"
 HOLDOUT_FRACTION = 0.2
