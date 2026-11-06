@@ -5,7 +5,7 @@ M.Tech (AIML) — Machine Learning, Assignment 2
 A comparison of five classification algorithms on real e-commerce session data,
 served through an interactive Streamlit application.
 
-**Live app:** _(deployed on Streamlit Community Cloud — link added after deployment)_
+**Live app:** https://shopper-intent-classifier-fubibbyroyskvvupsarr2l.streamlit.app
 
 ---
 
