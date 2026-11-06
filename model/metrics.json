@@ -1,0 +1,92 @@
+{
+  "dataset": {
+    "rows_total": 12205,
+    "rows_train": 9764,
+    "rows_holdout": 2441,
+    "feature_count": 17,
+    "positive_rate_overall": 0.15632937320770177,
+    "positive_rate_holdout": 0.15649324047521507
+  },
+  "models": {
+    "logistic_regression": {
+      "label": "Logistic Regression",
+      "best_params": {
+        "learner__C": "0.1",
+        "learner__class_weight": "balanced"
+      },
+      "fit_seconds": 3.49,
+      "metrics": {
+        "Accuracy": 0.8619,
+        "AUC": 0.9117,
+        "Precision": 0.5414,
+        "Recall": 0.7696,
+        "F1": 0.6357,
+        "MCC": 0.5667
+      }
+    },
+    "decision_tree": {
+      "label": "Decision Tree",
+      "best_params": {
+        "learner__class_weight": "None",
+        "learner__max_depth": "5",
+        "learner__min_samples_leaf": "20"
+      },
+      "fit_seconds": 2.02,
+      "metrics": {
+        "Accuracy": 0.907,
+        "AUC": 0.9321,
+        "Precision": 0.737,
+        "Recall": 0.6309,
+        "F1": 0.6798,
+        "MCC": 0.6284
+      }
+    },
+    "knn": {
+      "label": "K-Nearest Neighbours",
+      "best_params": {
+        "learner__n_neighbors": "5",
+        "learner__weights": "distance"
+      },
+      "fit_seconds": 0.98,
+      "metrics": {
+        "Accuracy": 0.8763,
+        "AUC": 0.7935,
+        "Precision": 0.6786,
+        "Recall": 0.3979,
+        "F1": 0.5017,
+        "MCC": 0.4568
+      }
+    },
+    "naive_bayes": {
+      "label": "Naive Bayes (Gaussian)",
+      "best_params": {
+        "learner__var_smoothing": "0.001"
+      },
+      "fit_seconds": 0.29,
+      "metrics": {
+        "Accuracy": 0.6534,
+        "AUC": 0.7939,
+        "Precision": 0.2864,
+        "Recall": 0.8141,
+        "F1": 0.4237,
+        "MCC": 0.32
+      }
+    },
+    "svm": {
+      "label": "Support Vector Machine",
+      "best_params": {
+        "learner__C": "1.0",
+        "learner__class_weight": "balanced"
+      },
+      "fit_seconds": 11.72,
+      "metrics": {
+        "Accuracy": 0.88,
+        "AUC": 0.919,
+        "Precision": 0.5906,
+        "Recall": 0.7592,
+        "F1": 0.6644,
+        "MCC": 0.5996
+      }
+    }
+  }
+}
