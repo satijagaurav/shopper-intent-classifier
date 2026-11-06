@@ -53,15 +53,18 @@ def normalise_frame(frame: pd.DataFrame) -> pd.DataFrame:
 
 def coerce_target(labels: pd.Series) -> pd.Series:
     """Parse the Revenue column into 0/1 ints, rejecting blank or unreadable cells."""
-    if labels.dtype == object or labels.dtype == bool or str(labels.dtype) == "str":
-        truthy = {"true", "1", "yes", "y", "t"}
+    is_string_like = (
+        labels.dtype == object or labels.dtype == bool or str(labels.dtype) == "str"
+    )
+    truthy = {"true", "1", "yes", "y", "t"}
+
+    if is_string_like:
         falsy = {"false", "0", "no", "n", "f"}
         parsed = labels.astype(str).str.strip().str.lower()
         unreadable = ~parsed.isin(truthy | falsy)
     else:
         parsed = pd.to_numeric(labels, errors="coerce")
         unreadable = parsed.isna()
-        truthy = None
 
     if unreadable.any():
         bad_rows = [str(i) for i in labels.index[unreadable][:5]]
@@ -71,7 +74,7 @@ def coerce_target(labels: pd.Series) -> pd.Series:
             "Every row must have a Revenue value of True/False, 1/0, or yes/no."
         )
 
-    if truthy is not None:
+    if is_string_like:
         return parsed.isin(truthy).astype(int)
     return parsed.astype(int)
 

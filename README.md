@@ -146,10 +146,12 @@ reproduces the table below exactly.
 
 ### Tests
 
-`tests/test_preprocessing.py` covers the CSV-validation path: a missing column,
-a blank or unreadable target cell, a missing categorical value, and non-numeric
-junk in a numeric column. All of these are rejected with a clear, caught error
-rather than a raw traceback.
+`tests/test_preprocessing.py` covers the CSV-validation path. A missing column
+and a blank or unreadable target cell are both rejected with a clear, caught
+error instead of a raw traceback. A missing categorical value is not an error —
+it's silently filled with a `"missing"` sentinel category. Non-numeric junk in
+a numeric column is likewise not an error — it's coerced to `0`. All four
+behaviours are asserted by the test suite.
 
 ```bash
 pip install -r requirements-dev.txt
