@@ -80,6 +80,11 @@ def test_coerce_target_rejects_nan_numeric_series():
         coerce_target(pd.Series([1, np.nan, 0]))
 
 
+def test_coerce_target_rejects_out_of_range_numeric_values():
+    with pytest.raises(InvalidTargetError, match="blank or unreadable"):
+        coerce_target(pd.Series([0, 1, 2]))
+
+
 def test_normalise_frame_fills_missing_categorical_with_sentinel_not_literal_nan():
     frame = _frame([True])
     frame.loc[0, "Month"] = np.nan

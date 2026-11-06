@@ -64,7 +64,7 @@ def coerce_target(labels: pd.Series) -> pd.Series:
         unreadable = ~parsed.isin(truthy | falsy)
     else:
         parsed = pd.to_numeric(labels, errors="coerce")
-        unreadable = parsed.isna()
+        unreadable = parsed.isna() | ~parsed.isin([0, 1])
 
     if unreadable.any():
         bad_rows = [str(i) for i in labels.index[unreadable][:5]]
